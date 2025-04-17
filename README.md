@@ -17,13 +17,6 @@ To compile the standard GUI-only executable (no console window):
 go build -ldflags "-H=windowsgui" -o notepadder.exe cmd/notepadder/main.go
 ```
 
-To compile for debugging (will show console window):
-
-```
-go build -o notepadder_debug.exe cmd/notepadder/main.go
-```
-Then run with `./notepadder_debug.exe --debug`
-
 ## Testing
 
 Run unit tests for the Windows wrapper:
