@@ -25,37 +25,63 @@ var (
 )
 
 // Run finds or launches Notepad, activates it, and optionally sends Ctrl+T
-func Run(noNew bool) error {
+func Run(noNew bool, debug bool) error {
+	if debug { fmt.Println("Attempting to find Notepad window...") }
 	hwnd, err := findWindow()
 	if err != nil {
+		if debug { fmt.Printf("Error finding window: %v\n", err) }
 		return err
 	}
+	if debug { fmt.Printf("FindWindow result: hwnd=%v\n", hwnd) }
+
 	if hwnd == 0 {
+		if debug { fmt.Println("Notepad window not found. Launching...") }
 		if err := launchNotepad(); err != nil {
+			if debug { fmt.Printf("Error launching notepad: %v\n", err) }
 			return err
 		}
+		if debug { fmt.Println("Notepad launched. Waiting for window...") }
+		found := false
 		for i := 0; i < 50; i++ {
 			time.Sleep(100 * time.Millisecond)
+			if debug { fmt.Printf("  Retry %d: Calling FindWindow...\n", i+1) }
 			hwnd, err = findWindow()
 			if err != nil {
-				return err
+				if debug { fmt.Printf("  Retry %d: Error finding window: %v\n", i+1, err) }
+				// Don't return immediately, maybe transient error
 			}
+			if debug { fmt.Printf("  Retry %d: FindWindow result: hwnd=%v\n", i+1, hwnd) }
 			if hwnd != 0 {
+				if debug { fmt.Println("  Window found!") }
+				found = true
 				break
 			}
 		}
-		if hwnd == 0 {
-			return fmt.Errorf("could not find Notepad window after launch")
+		if !found {
+			 err := fmt.Errorf("could not find Notepad window after launch and 50 retries")
+			 if debug { fmt.Printf("Error: %v\n", err)}
+			 return err
 		}
 	}
+
+	if debug { fmt.Printf("Activating window: hwnd=%v\n", hwnd) }
 	if err := activateWindow(hwnd); err != nil {
+		if debug { fmt.Printf("Error activating window: %v\n", err) }
 		return err
 	}
+	if debug { fmt.Println("Window activated.") }
+
 	if !noNew {
+		if debug { fmt.Println("Sending Ctrl+T...") }
 		if err := sendCtrlT(); err != nil {
+			if debug { fmt.Printf("Error sending Ctrl+T: %v\n", err) }
 			return err
 		}
+		if debug { fmt.Println("Ctrl+T sent.") }
+	} else {
+		if debug { fmt.Println("Skipping new tab (--no-new specified).") }
 	}
+
 	return nil
 }
 

@@ -47,7 +47,7 @@ func TestRun_WithNewTab(t *testing.T) {
 		return nil
 	}
 
-	if err := Run(false); err != nil {
+	if err := Run(false, false); err != nil {
 		t.Fatalf("Run(false) error: %v", err)
 	}
 
@@ -87,7 +87,7 @@ func TestRun_NoNewTab(t *testing.T) {
 		return errors.New("should not be called")
 	}
 
-	if err := Run(true); err != nil {
+	if err := Run(true, false); err != nil {
 		t.Fatalf("Run(true) error: %v", err)
 	}
 
