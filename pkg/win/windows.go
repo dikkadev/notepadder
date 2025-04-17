@@ -14,6 +14,7 @@ var (
 	procSetForegroundWindow   = user32.MustFindProc("SetForegroundWindow")
 	procShowWindow            = user32.MustFindProc("ShowWindow")
 	procKeybdEvent            = user32.MustFindProc("keybd_event")
+	procIsIconic              = user32.MustFindProc("IsIconic")
 )
 
 // overrideable functions for testing
@@ -84,6 +85,8 @@ func Run(noNew bool, debug bool) error {
 		if debug { fmt.Println("Skipping new tab (--no-new specified).") }
 	}
 
+	// Add a small delay before exiting to allow activated window to settle
+	time.Sleep(100 * time.Millisecond)
 	return nil
 }
 
@@ -110,9 +113,15 @@ func launchNotepadInternal() error {
 }
 
 func setForegroundWindow(hwnd syscall.Handle) error {
-	const SW_RESTORE = 9
-	// restore if minimized
-	procShowWindow.Call(uintptr(hwnd), uintptr(SW_RESTORE))
+	// Check if minimized
+	isMinimized, _, _ := procIsIconic.Call(uintptr(hwnd))
+	if isMinimized != 0 {
+		const SW_RESTORE = 9
+		// restore if minimized
+		procShowWindow.Call(uintptr(hwnd), uintptr(SW_RESTORE))
+	}
+
+	// Now set foreground
 	r1, _, e1 := procSetForegroundWindow.Call(uintptr(hwnd))
 	if r1 == 0 {
 		return e1
