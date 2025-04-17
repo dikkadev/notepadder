@@ -43,7 +43,7 @@ func Run(noNew bool, debug bool) error {
 		if debug { fmt.Println("Notepad launched. Waiting for window...") }
 		found := false
 		for i := 0; i < 50; i++ {
-			time.Sleep(100 * time.Millisecond)
+			time.Sleep(50 * time.Millisecond)
 			if debug { fmt.Printf("  Retry %d: Calling FindWindow...\n", i+1) }
 			hwnd, err = findWindow()
 			if err != nil {
