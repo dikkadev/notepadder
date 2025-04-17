@@ -73,6 +73,8 @@ func Run(noNew bool, debug bool) error {
 
 	if !noNew {
 		if debug { fmt.Println("Sending Ctrl+T...") }
+		// Add a small delay to allow Notepad to fully initialize after activation
+		time.Sleep(100 * time.Millisecond)
 		if err := sendCtrlT(); err != nil {
 			if debug { fmt.Printf("Error sending Ctrl+T: %v\n", err) }
 			return err
