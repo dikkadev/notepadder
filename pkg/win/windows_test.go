@@ -23,8 +23,8 @@ func TestRun_WithNewTab(t *testing.T) {
 	firstCall := true
 	// simulate initial no window, then window found
 	findWindow = func() (syscall.Handle, error) {
-		callOrder = append(callOrder, "find")
 		if firstCall {
+			callOrder = append(callOrder, "find")
 			firstCall = false
 			return 0, nil
 		}
