@@ -95,7 +95,10 @@ func findNotepadWindow() (syscall.Handle, error) {
 		uintptr(0),
 	)
 	if r1 == 0 {
-		return 0, e1
+		if e1.(syscall.Errno) != 0 {
+			return 0, e1
+		}
+		return 0, nil
 	}
 	return syscall.Handle(r1), nil
 }
